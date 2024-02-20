@@ -1,18 +1,50 @@
 // import '../assets/css/Login.css'
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { SignIn, reset } from "../store/features/userAuth/authSlice";
+import { toast } from "react-toastify";
 
 const Login = () => {
-  const {
-    register,
-    formState: { errors },
-  } = useForm();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { success, loading, error, user } = useSelector((state) => state.auth);
+
+  const userData = !!user;
+
+  useEffect(() => {
+    if (success || user) {
+      navigate("/app", { replace: true });
+      localStorage.setItem("id", JSON.stringify(user._id));
+      // toast.success("login successful", { delay: 1000 });
+    }
+
+    if (error) {
+      toast.error(error);
+      dispatch(reset());
+    }
+  }, [success, error, loading, dispatch, userData]);
+
+  function onSubmit(e) {
+    e.preventDefault();
+    const user = {
+      email,
+      password,
+    };
+
+    dispatch(SignIn(user));
+
+    setEmail("");
+    setPassword("");
+  }
 
   return (
     <>
       <div className="con">
         <main className="wrapper">
-          <form>
+          <form onSubmit={onSubmit}>
             <div className="user">
               <h4>Welcome, User</h4>
               <p>Please login</p>
@@ -21,48 +53,25 @@ const Login = () => {
               <label htmlFor="email">Email</label>
               <input
                 type="email"
-                name="email"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: /^\S+@\S+$/i,
-                })}
-                placeholder="Email"
+                placeholder="enter Email"
                 id="email"
-                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              {errors.email && <p>{errors.email.message}</p>}
             </div>
             <div className="form-controls">
               <label htmlFor="password">Password</label>
               <input
                 type="password"
-                name="password"
-                id="password"
-                {...register("password", { required: "Password is required" })}
                 placeholder="Password"
-                required
-              />
-              {errors.password && <p>{errors.password.message}</p>}
-              <i className="bi bi-eye-slash" id="togglePassword"></i>
-            </div>
-            <div className="form-controls">
-              <label htmlFor="password">Confirm Password</label>
-              <input
-                type="password"
-                name="password"
                 id="password"
-                {...register("password", { required: "Password is required" })}
-                placeholder="Password"
-                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-              {errors.password && <p>{errors.password.message}</p>}
-              <i className="bi bi-eye-slash" id="togglePassword"></i>
             </div>
-            <Link to="/app">
-              <button type="submit" className="submit">
-                Log in
-              </button>
-            </Link>
+            <button type="submit" className="submit">
+              Log in
+            </button>
 
             <p>
               <Link to="/signup">Dont have an account? Sign up</Link>

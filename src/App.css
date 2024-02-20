@@ -12,13 +12,13 @@
 form {
   width: 30%;
   height: 100%;
-  background-color: blanchedalmond;
-  background: rgb(143, 106, 69);
+  /* background-color: blanchedalmond; */
+  /* background: rgb(143, 106, 69); */
   margin: 1rem auto;
   padding: 1rem;
   border-radius: 1rem;
   box-shadow: 0 0.5rem 1rem;
-  background: rgb(166, 114, 77);
+  /* background: rgb(166, 114, 77); */
 }
 
 form label {

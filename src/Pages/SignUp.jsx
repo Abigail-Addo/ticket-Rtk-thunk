@@ -1,47 +1,45 @@
 // import '../assets/css/Signup.css';
 // import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import {  useDispatch } from "react-redux";
-import { signup } from "../store/features/userAuth/authSlice";
+import { useDispatch } from "react-redux";
+import { SignUp } from "../store/features/userAuth/authSlice";
+import { toast } from "react-toastify";
 
-// eslint-disable-next-line react/prop-types
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const {
-    register,
-    formState: { errors },
-  } = useForm();
-
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const onSubmit = (e) => {
     e.preventDefault();
 
-    if(password != confirmPassword) {
-     return alert("passwords do not match")
+    if (password !== confirmPassword) {
+      return toast.error("Please passwords should match");
     }
+
     const user = {
       email,
-      password
-    }
-    dispatch(signup(user));
+      password,
+    };
 
-    setConfirmPassword('')
-    setPassword('')
-    setEmail('')
-  }
+    dispatch(SignUp(user));
 
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+
+    navigate("/")
+  };
 
   return (
     <>
       <div className="wrapper-container">
         <main className="main-wrapper">
-          <form  onSubmit={onSubmit}>
+          <form onSubmit={onSubmit}>
             <div className="user">
               <h4>Welcome, User</h4>
               <p>Please please provide your information for signup</p>
@@ -50,42 +48,35 @@ const dispatch = useDispatch();
               <label htmlFor="email">Email</label>
               <input
                 type="email"
-                name="email"
+                placeholder="Email"
                 id="email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                autoComplete="true"
-                {...register("email", { pattern: /^\S+@\S+$/i })}
-                required
               />
-              {errors.email && <p>{errors.email.message}</p>}
             </div>
             <div className="form-controls">
               <label htmlFor="password">Password</label>
               <input
                 type="password"
-                name="password"
+                placeholder="Password"
                 id="password"
-                autoComplete="true"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                {...register("password")}
-                required
               />
             </div>
             <div className="form-controls">
               <label htmlFor="ConfirmPassword">Confirm Password</label>
               <input
                 type="password"
-                name="password"
+                placeholder="Confirm Password"
                 id="ConfirmPassword"
-                autoComplete="true"
+                value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                {...register("confirmPassword")}
-                required
               />
             </div>
 
-            <button type="submit" className="submit">
-              Sign in
+            <button type="submit" className="submit" disabled={!email || !password || !confirmPassword}>
+              Sign up
             </button>
 
             <p>

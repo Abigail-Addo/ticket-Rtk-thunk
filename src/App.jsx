@@ -5,6 +5,7 @@ import TicketList from "./Components/TicketList";
 import { useDispatch, useSelector } from "react-redux";
 // import { addTicket } from "./Store/Features/Tickets/ticketSlice";
 import { addTicketThunk, fetchTicketsThunk } from "./store/features/tickets/ticketSlice";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [title, setTitle] = useState("");
@@ -13,28 +14,39 @@ function App() {
   const dispatch = useDispatch();
   const tickets = useSelector((state) => state.tickets.tickets);
   // console.log(tickets);
+  const { user } = useSelector((state) => state.auth)
+
+  const userData = !!user;
+
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    console.log(user._id)
     const ticket = {
       title,
       description,
-      workedOn: false,
+      user: user._id
     };
 
     // dispatch(addTicket(ticket))
     // setTitle("")
     // setDescription("")
 
-    dispatch(addTicketThunk(ticket));
+    dispatch(addTicketThunk(ticket, user._id));
     setTitle("");
     setDescription("");
   };
 
   useEffect(() => {
-    dispatch(fetchTicketsThunk());
-  }, [dispatch]);
+    if (!user) {
+      navigate("/");
+    }
+    if (userData) {
+      dispatch(fetchTicketsThunk(user._id));
+    }
+  }, [navigate, userData, dispatch]);
 
   return (
     <>
@@ -42,23 +54,25 @@ function App() {
       <div className="App">
         <form onSubmit={handleSubmit}>
           <div className="formInput">
-            <label>Title</label>
+            <label htmlFor="title">Title</label>
             <input
               type="text"
               name="title"
               placeholder="heading"
+              id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
           <div className="formInput">
-            <label>Description</label>
+            <label htmlFor="desc">Description</label>
             <textarea
               type="textarea"
               col="40"
               rows="7"
               placeholder="description"
+              id="desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
